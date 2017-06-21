@@ -5,6 +5,7 @@
 {{ LANG.ENTER_TICKET_DETAILS }}
 <br /><br />
 {% if error_msg != '' %}{{ error_message(error_msg) }}<br />{% endif %}
+<!--Este es el formulario de enviar un ticket, donde se coloca el detalle del ticket -->
 <form method="post" action="{{ getUrl('submit_ticket','confirmation') }}" enctype="multipart/form-data">
 <input type="hidden" name="csrfhash" value="{{ getToken('submit_ticket') }}" />
 <input type="hidden" name="department" value="{{ department_id }}" />
@@ -16,14 +17,14 @@
     <tr>
             <td class="zebraodd" nowrap="nowrap"><span class="{% if  'fullname' in emptyvars %}redtxt{% endif %}">{{ LANG.FULL_NAME }}:</span> <span class="redtxt">*</span> 
             </td>
-            <td>
-            <input type="text" name="fullname" size="30" value="{{ POST.fullname }}" />
+            <td><!-- 25/01/2017 Alexis Goatache - Se incluye style="text-transform:lowercase", para que cambie las letras a minusculas-->
+            <input type="text" name="fullname" size="30" style="text-transform:lowercase" value="{{ POST.fullname }}" />
             </td>            
     </tr>
     <tr>
         <td class="zebraodd"><span class="{% if 'email' in emptyvars %}redtxt{% endif %}">{{ LANG.EMAIL }}:</span> <span class="redtxt">*</span> </td>
-        <td>
-        <input type="text" name="email" size="30" value="{{ POST.email }}"  />
+        <td><!-- 25/01/2017 Alexis Goatache - Se incluye style="text-transform:lowercase", para que cambie las letras a minusculas-->
+        <input type="text" name="email" size="30" style="text-transform:lowercase" value="{{ POST.email }}"  />
         </td>
     </tr>
     {% endif %}

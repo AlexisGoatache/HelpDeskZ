@@ -1,0 +1,436 @@
+{% extends 'site.html' %}
+{% block title %}Inventario{% endblock %}
+{% block content %}
+
+<div id="home_title">Inventario</div>
+<div id="home_content">
+    <div id="home_left">
+        <div id="avatar"><img src="{{ getUrl() }}/images/default_avatar.png" /></div>
+        <div id="information">
+            <div id="fullname">{{ staff.fullname }}</div>
+            <div id="extrainfo">
+                <div>{{ LANG.USERNAME }}: {{ staff.username }}</div>
+                <div>{{ LANG.EMAIL_ADDRESS }}: {{ staff.email }}</div>
+                <div>{{ LANG.LAST_LOGIN }}: {{ displayDate(staff.last_login) }}</div>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div id="calendar">
+        <div class="top">{{ "now"|date("M") }}</div>
+        <div class="day">
+            <small>{{ "now"|date("l") }}</small>
+            <div>{{ "now"|date("d") }}</div>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <h2>{{ LANG.TICKET_SUMMARY }}</h2>
+    <div class="ticket_summary">
+        <ul>
+            <li><div onclick="location.href='{{ getUrl(controller,'tickets',null,'do=search&status=1')|raw }}';">{{ LANG.OPEN }}<span>{{ tickets_summary.open }}</span></div></li>
+            <li><div onclick="location.href='{{ getUrl(controller,'tickets',null,'do=search&status=3')|raw }}';">{{ LANG.AWAITING_REPLY }}<span>{{ tickets_summary.awaiting_reply }}</span></div></li>
+            <li><div onclick="location.href='{{ getUrl(controller,'tickets',null,'do=search&status=4')|raw }}';">{{ LANG.IN_PROGRESS }}<span>{{ tickets_summary.in_progress }}</span></div></li>
+            <li><div onclick="location.href='{{ getUrl(controller,'tickets',null,'do=search&status=2')|raw }}';">{{ LANG.ANSWERED }}<span>{{ tickets_summary.answered }}</span></div></li>
+            <li><div onclick="location.href='{{ getUrl(controller,'tickets',null,'do=search&status=5')|raw }}';">{{ LANG.CLOSED }}<span>{{ tickets_summary.closed }}</span></div></li>
+        </ul>
+        <div class="clear"></div>
+    </div>
+	
+	<br/><br/><br/><br/>
+
+<?php
+
+//INICIO DE SESSION DE USUARIO
+//session_start();
+
+//1. CONECTAR CON MYSQL
+//2. CONECTAR CON BD
+$conexion = mysqli_connect("localhost", "root", "", "bdsolintex");
+if ($conexion->connect_errno) { echo "Falló la conexión a MySQL: (" . $conexion->connect_errno . ") " . $conexion->connect_error;}
+
+// RESCATAR LAS VARIABLES DEL FORMULARIO
+
+  $BtnAccion= isset($_REQUEST['BtnAccion']) ? $_REQUEST['BtnAccion'] : NULL;
+  $CmbEquipos= isset($_REQUEST['CmbEquipos']) ? $_REQUEST['CmbEquipos'] : NULL;
+  $CmbOperadores= isset($_REQUEST['CmbOperadores']) ? $_REQUEST['CmbOperadores'] : NULL;
+  $CmbDepartamentos= isset($_REQUEST['CmbDepartamentos']) ? $_REQUEST['CmbDepartamentos'] : NULL;
+  $CmbLocalidades= isset($_REQUEST['CmbLocalidades']) ? $_REQUEST['CmbLocalidades'] : NULL;
+  $CmbStatus= isset($_REQUEST['CmbStatus']) ? $_REQUEST['CmbStatus'] : NULL;
+  $TxtPatchPanel= isset($_REQUEST['TxtPatchPanel']) ? $_REQUEST['TxtPatchPanel'] : NULL;
+  $TxtIp= isset($_REQUEST['TxtIp']) ? $_REQUEST['TxtIp'] : NULL;
+  $TxtMacAddress= isset($_REQUEST['TxtMacAddress']) ? $_REQUEST['TxtMacAddress'] : NULL;
+  // DESARROLLAR LOGICA DE LOS BOTONES
+
+switch($BtnAccion){
+
+case 'Buscar':
+break;
+
+case 'Limpiar':
+break;}
+
+
+function query($sql) {
+global $conexion,$sql,$CmbEquipos,$CmbOperadores,$CmbDepartamentos,$CmbLocalidades,$CmbStatus,$registro;
+  // 3. CONSTRUIR CONSULTA INICIAL
+  $consulta = '';
+  if($CmbEquipos != 0){
+    $consulta = $consulta." AND tbequipos.idequipo= '$CmbEquipos'";}
+  if($CmbOperadores != 0){
+    $consulta= $consulta." AND tbequipos.idoperador='$CmbOperadores'";}
+  if($CmbDepartamentos != 0){
+    $consulta= $consulta." AND tbequipos.iddepartamento= '$CmbDepartamentos'";}
+  if($CmbLocalidades != 0){
+      $consulta= $consulta." AND tbequipos.idlocalidad= '$CmbLocalidades'";}
+  if($CmbStatus != 0){
+      $consulta= $consulta." AND tbequipos.idstatus= '$CmbStatus'";}
+
+   $sql="SELECT * FROM tbequipos,tboperadores,tbdepartamentos,tbstatus,tblocalidades WHERE
+        tbequipos.idoperador=tboperadores.idoperador AND tbequipos.iddepartamento=tbdepartamentos.iddepartamento AND
+        tbequipos.idlocalidad=tblocalidades.idlocalidad AND tbequipos.idstatus=tbstatus.staid $consulta ORDER BY tbequipos.idequipo asc";
+?>
+  <table> <!--tabla de consulta de equipos-->
+    <tr> <!--Consulta principal de equipos -->
+      <?php // 4 ejecutar la consulta principal
+      //if ($conexion->connect_errno) { echo "Falló la conexión con MySQL: (" . $conexion->connect_errno . ") " . $conexion->connect_error;}
+	  //if ($conexion->connect_errno) { echo "Falló la conexión a MySQL: (" . $conexion->connect_errno. ") " . $conexion->connect_error;}
+      // 5. VERIFICAR SI LO ENCONTRO
+		$resultado = mysqli_query($conexion,$sql, MYSQLI_USE_RESULT);
+		//$registro=$conexion->query($sql);
+		if($resultado){?>
+              <tr> <!--encabezado de la consulta principal - recorrer el resultado de la consulta principal-->
+                   <th>#</th>
+                   <th>ID</th>
+                   <th>USUARIO</th>
+                   <th>OPERADOR</th>
+                   <th>DEPARTAMENTO</th>
+                   <th>LOCALIDAD</th>
+                   <th>PATCH PANEL</th>
+                   <th>IP</th>
+                   <th>ESTATUS</th>
+                   <th>OBSERVACI&Oacute;N</th>
+              </tr>
+          <?php    
+			$i=0;
+			while ($registro = mysqli_fetch_array($resultado)){
+			//do{
+            $i++;?>
+            <td><?php echo $i?></td>             <!-- Nros de equipos -->
+            <td><?php echo $registro[0]?> </td>  <!-- Id equipo -->
+            <td><?php echo "<a href=equipos/$registro[1].html target=_blank> $registro[1] </a>"?></td>   <!-- descripcion del equipo -->
+            <td><?php echo $registro[11]?></td>  <!-- operador -->
+            <td><?php echo $registro[13]?></td>  <!-- departamento -->
+            <td><?php echo $registro[17]?></td>  <!-- Localidad -->
+            <td><?php echo $registro[5]?></td>   <!-- Patch Panel -->
+            <td><?php echo $registro[6]?></td>   <!-- Ip -->
+            <td><?php echo $registro[15]?></td>  <!-- Status -->
+            <td><?php echo $registro[8]?></td>   <!-- observacion -->
+
+      </tr><?php }?>
+	  
+	<tr> <!--Consulta principal de equipos -->
+      <?php // 4 ejecutar la consulta principal
+		$sql1="SELECT *,DATE_FORMAT(fecha_compra, '%d/%m/%Y') AS fecha1 FROM
+                    tbequipos,tbtipodispositivos,tbdispositivos,tbmarcas,tbmodelos,tbproveedores,tbstatus,tblocalidades WHERE
+                    tbdispositivos.idequipo=tbequipos.idequipo AND
+                    tbdispositivos.idtipodispositivo=tbtipodispositivos.idtipodispositivo AND
+                    tbdispositivos.idmarca=tbmarcas.idmarca AND
+                    tbdispositivos.idmodelo=tbmodelos.idmodelo AND
+                    tbdispositivos.idproveedor=tbproveedores.idproveedor AND
+                    tbdispositivos.idstatus=tbstatus.staid AND
+                    tbdispositivos.idlocalidad=tblocalidades.idlocalidad AND tbdispositivos.idequipo='$registro[0]'";
+		
+		$resultado1 = mysqli_query($conexion,$sql1, MYSQLI_USE_RESULT);
+		if($resultado1){?>
+            <tr> <!--Encabezado de la sub-consulta-->
+              <th>#</th>
+              <th>ID</th>
+              <th>DISPOSITIVO</th>
+              <th>MARCA</th>
+              <th>MODELO</th>
+              <th>SERIAL</th>
+              <th>LOCALIDAD</th>
+              <th>PROVEEDOR</th>
+              <th>FECHA COMPRA</th>
+              <th>PRECIO</th>
+              <th>ESTATUS</th>
+              <th>OBSERVACI&Oacute;N</th>
+            </tr>
+          <?php    
+			$x=0;
+			while ($registro = mysqli_fetch_array($resultado)){
+                $x++;?>
+                <tr>
+                <td><?php echo $x?></td>              <!-- Nros de dispositivos -->
+                <td><?php echo $registro1[11]?></td>   <!-- Id dipositivos -->
+                <td><?php echo $registro1[10]?></td>  <!-- tipo de dispositivo -->
+                <td><?php echo $registro1[24]?></td>  <!-- marca -->
+                <td><?php echo $registro1[27]?></td>  <!-- modelo -->
+                <td><?php echo $registro1[15]?></td>  <!-- serial -->
+                <td><?php echo $registro1[38]?></td>  <!-- localidad -->
+                <td><?php echo $registro1[30]?></td>  <!-- proveedor -->
+                <td><?php echo $registro1[39]?></td>  <!-- fecha de compra -->
+                <td><?php echo $registro1[18]?></td>  <!-- precio -->
+                <td><?php echo $registro1[36]?></td>  <!-- status -->
+                <td><?php echo $registro1[19]?></td>  <!-- observacion -->
+
+      </tr><?php 
+                  }
+        }
+	  
+        } else {
+         ?>
+         <script>alert ("No existen registros con esa condición!!!");</script>
+         <?php }
+
+        
+			
+  echo"</table>";}
+?>
+
+
+<script type="text/javascript">
+
+function validar(form){
+
+          if (form.TxtDescripcion.value==0 ){
+               alert('Debe introducir el nombre del Departamento');
+               form.TxtDescripcion.focus();
+               return false;}
+
+else {return true;}
+}
+
+function validabuscar(form){
+    if (form.TxtId.value==0 ){
+       alert('Debe introducir el Código del Departamento');
+       return false;}
+    else {
+      return true;}
+}
+
+
+var btnNotification = document.getElementById("BtnAccion"),
+    btnPermission = document.getElementById("buttonP")
+    title = "Centro de Soporte Solintex de Venezuela, S.A.",
+    more = {
+        icon: "images/logo_solintex.jpg",
+        body: "Notificacion de prueba "
+    };
+
+function permission() {
+	
+	Notification.requestPermission();
+};
+
+function showNotification() {
+permission === "granted";	
+	if(Notification) {
+        //if (Notification.permission == "granted"){
+			if (Notification.permission !== 'denied'){
+			var n = new Notification(title, more);
+            setTimeout( function() { n.close() }, 5000);
+        } else if(Notification.permission == "default") {
+            alert("Primero da los permisos de notificación");
+        } else {
+            alert("Bloqueaste los permisos de notificación"); }
+    } else { alert("Tu navegador no es compatible con API Notification"); }
+};
+
+btnPermission.addEventListener("click", permission)
+btnNotification.addEventListener("click", showNotification);
+
+</script>
+
+
+
+
+<html>
+<head>
+<title>CONSULTA DE EQUIPOS</title>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="HAPedit 3.1">
+<link rel="stylesheet" type="text/css" href="css/solintex.css" />
+<script type="text/javascript">
+</script>
+</head>
+
+<body bgcolor="#FFFFFF">
+
+<form action="<?php  $PHP_SELF ?>" name="FrmEquipos" method="post">
+      <fieldset>
+        <legend> CONSULTA DE EQUIPOS </legend>
+          <table>
+            <tr>
+              <th>EQUIPOS</th>
+              <th>OPERADOR</th>
+              <th>DEPARTAMENTO</th>
+              <th>LOCALIDAD</th>
+              <th>PATCH PANEL</th>
+              <th>IP</th>
+              <th>MAC ADDRESS</th>
+              <th>ESTATUS</th>
+            </tr>
+            <tr>
+              <td><select name="CmbEquipos">
+              <option value="0">Seleccione</option>
+              <?php //carga el combo con equipos
+			  $sql="SELECT * FROM tbequipos";
+			  $resultado = mysqli_query($conexion,$sql, MYSQLI_USE_RESULT);
+			  //$resultado = $conexion->query("SELECT * FROM tbequipos");
+				while ($registro = mysqli_fetch_array($resultado)){
+					echo "<option value='$registro[0]'>$registro[1]</option>";}?>
+			  </select></td>
+              
+			  <td><select name="CmbOperadores">
+              <option value="0">Seleccione</option>
+              <?php //carga el combo con los operadores
+			  $sql="SELECT * FROM tboperadores";
+			  $resultado = mysqli_query($conexion,$sql, MYSQLI_USE_RESULT);
+				while ($registro = mysqli_fetch_array($resultado)){
+					echo "<option value='$registro[0]'>$registro[3]</option>";}?>
+              </select></td>
+
+              <td><select name="CmbDepartamentos">
+              <option value="0">Seleccione</option>
+              <?php //carga el combo con los departamentos
+			  $sql="SELECT * FROM tbdepartamentos";
+			  $resultado = mysqli_query($conexion,$sql, MYSQLI_USE_RESULT);
+				while ($registro = mysqli_fetch_array($resultado)){
+					echo "<option value='$registro[0]'>$registro[1]</option>";}?>
+              </select></td>
+
+              <td><select name="CmbLocalidades">
+              <option value="0">Seleccione</option>
+              <?php //carga el combo con localidades de dispositivos
+				$sql="SELECT * FROM tblocalidades";
+				$resultado = mysqli_query($conexion,$sql, MYSQLI_USE_RESULT);
+				while ($registro = mysqli_fetch_array($resultado)){
+					echo "<option value='$registro[0]'>$registro[1]</option>";}?>
+			</select></td>
+              
+			  <td><input type="text"
+                 name="TxtPatchPanel"
+                 value="<?php  echo $TxtPatchPanel; ?>"
+                 size="15"
+                 maxlength="15" /></td>
+
+              <td><input type="text"
+                 name="TxtIp"
+                 value="<?php  echo $TxtIp; ?>"
+                 size="10"
+                 maxlength="10" /></td>
+
+              <td><input type="text"
+                 name="TxtMacAddress"
+                 value="<?php  echo $TxtMacAddress; ?>"
+                 size="15"
+                 maxlength="15" /></td>
+
+              <td><select name="CmbStatus">
+              <option value="0">Seleccione</option>
+              <?php //CARGA EL COMBO DE STATUS
+              // 3. CONSTRUIR CONSULTA
+				$sql="SELECT * FROM tbstatus";
+				$resultado = mysqli_query($conexion,$sql, MYSQLI_USE_RESULT);
+				while ($registro = mysqli_fetch_array($resultado)){
+					echo "<option value='$registro[0]'>$registro[1]</option>";}?>
+			</select></td>
+</table>
+<hr />
+<table>
+</tr>
+	<tr>
+			<div align=center>
+				<button type="submit" name="BtnAccion" value="Buscar" onclick="return validabuscar(this.form)"/>Buscar</button>
+				<button type="submit" name="BtnAccion" value="Limpiar" />Limpiar</button>
+				<button type="submit" name="BtnAccion" value="Notificar" onclick="return showNotification()"/>Notificar</button>
+				
+		</div>	
+	</tr>
+</table>
+
+<hr />
+<?php query($sql);?>
+</body>
+</table>
+</html>
+
+
+
+
+	<br/><br/><br/><br/>
+		
+    <div id="home_tabs">
+        <ul>
+            <li id="htab1" class="active">{{ LANG.WELCOME }}</li>
+            <li id="htab2">{{ LANG.LOGIN_HISTORY }}</li>
+            <li id="htab3">{{ LANG.PRODUCT_INFORMATION }}</li>
+        </ul>
+    </div>           
+    <div id="home_tabs_content">
+        <div class="htab1 home_tab_content">
+            <table class="home_tab_tbl">
+                <tr>
+                    <th nowrap="nowrap" rowspan="2" width="auto">{{ LANG.NEWS }}</th>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td class="linetbl">
+                    </td>
+                </tr>
+            </table>
+            {% for news in lastestnews %}
+            {% set n = {0: 'view', 1: news.id} %}
+            <div class="newstitle"><a href="{{ getUrl(controller,'news',n)|raw }}">{{ news.title }}</a></div>
+            <div class="newsdescription">{{ LANG.POSTED_BY_ON|replace({'%author%':news.author, '%date%':displayDate(news.date)}) }}</div>
+            <div class="newscontent">{{ news.content|raw }}</div>
+            {% endfor %}
+        </div>
+        <div class="htab2 home_tab_content" style="display:none">
+            <table class="home_tab_tbl">
+                <tr>
+                    <th nowrap="nowrap" rowspan="2" width="auto">{{ LANG.LOGIN_HISTORY }}</th>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td class="linetbl"> </td>
+                </tr>
+            </table>
+            <table width="100%" class="widget-table">
+                <thead>
+                    <tr>
+                        <th>{{ LANG.IP_ADDRESS }}</th>
+                        <th>{{ LANG.USER_AGENT }}</th>
+                        <th>{{ LANG.DATE }}</th>
+                    </tr>
+                </thead>
+                {% for login_log in login_log %}
+                {% set trzebra = (trzebra == ''?1:'') %}
+                    <tr class="{% if trzebra == 1 %}trzebra{% endif %}">
+                            <td>{{ login_log.ip }}</td>
+                            <td>{{ login_log.agent }}</td>
+                            <td>{{ displayDate(login_log.date) }}</td>
+                        </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="htab3 home_tab_content" style="display:none">
+            <table class="home_tab_tbl">
+                <tr>
+                    <th nowrap="nowrap" rowspan="2" width="auto">{{ LANG.PRODUCT_INFORMATION }}</th>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td class="linetbl"> </td>
+                </tr>
+            </table>
+            <div>HelpDeskZ version {{ settings.helpdeskz_version }}</div>
+            <div>Copyright &copy; {{ "now"|date("Y") }}</div>
+            <div>Website: <a href="http://www.helpdeskz.com">http://www.helpdeskz.com</a></div>
+            <div>HelpDeskZ was developed by Evolution Script S.A.C. </div>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+{% endblock %}

@@ -246,6 +246,8 @@ if($action == 'displayForm' || $action == 'confirmation'){
                                     '%ticket_department%' => $department['name'],
                                     '%ticket_status%' => $LANG['OPEN'],
                                     '%ticket_priority%' => $priorityvar['name'],
+									//21/06/2017 Alexis Goatache - Se agrega la variable %messege%, para que pueda aparecer en el correo el mensaje del ticket.
+									'%message%' =>$data['message'],
                                 ),
                             );
                             $mailer = new Mailer($data_mail);

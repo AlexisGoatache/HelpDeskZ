@@ -36,7 +36,7 @@
         <li>{{ LANG.GENERAL }}</li>
         <li>{{ LANG.REPLY }}</li>
     </ul>
-    <div id="ctab1">
+    <div id="ctab1"><!--Este bloque es la pesataña General-->
 		<div class="ticket_information">
             <div class="ticket_subject">
                 <div>{{ ticket.subject }}</div>
@@ -44,7 +44,7 @@
             </div>
             <form method="post" action="{{ getUrl(controller, action, ['view',ticket.id,'update'])|raw }}">
             <div class="ticket_details">
-                <div class="ticket_details_block">
+                <div class="ticket_details_block"><!--Este bloque actualiza el estatus de los tickets-->
                     <div class="b_title">{{ LANG.TICKET_ID }}</div>
                     <div><input type="text" value="{{ ticket.code }}" disabled="disabled" /></div>
                 </div>
@@ -118,7 +118,7 @@
             {% endif %}
         </div>
 	</div>
-    <div id="ctab2">
+    <div id="ctab2"><!--Este bloque es la pesataña Responder-->
   
         <form method="post" action="{{ getUrl(controller, action, ['view',ticket.id,'reply'])|raw }}" name="reply" id="reply" enctype="multipart/form-data">
         <table class="widget-table-form">
@@ -177,6 +177,21 @@
                        </div>
                         <div class="ticket_msg">
                         {{ message.message|nl2br }}
+						
+                        {% if message.attachments.total != 0 %}<!--31/01/2017 Alexis Goatache - Mostrar imagen adjunta -->
+							{% if message.attachments.filetype =='image/png' or message.attachments.filetype =='image/jpeg' or message.attachments.filetype =='image/jpg' or messages.attachments.filetype 	=='image/ico' %}<br/>
+							    <div><img src="{{ getUrl(controller,action,['view',message.ticket_id,'attachment',message.attachments.id,message.id])|raw }}" width="622" height="416" /></div>
+							{% endif %}
+							
+							<!--17/02/2017 Alexis Goatache - se agrega para mostrar en los pdf adjuntos-->
+							{% if message.attachments.filetype =='application/pdf'%}<br/>
+							    <div><embed src="{{ getUrl(controller,action,['view',message.ticket_id,'attachment',message.attachments.id,message.id])|raw }}" type="application/pdf" width="622" height="800"></embed>
+							    </div>
+							{% endif %}
+						{% endif %}
+
+						<br/>
+
                         {% if message.attachments.total != 0 %}
 						<div style="padding-top:10px; font-size:14px;"><i><strong>{{ LANG.ATTACHMENTS }}</strong></i></div>	
 								<div><span class="ticket_icon_trash" onclick="location.href='{{ getUrl(controller,action,['view',message.ticket_id,'remove_attachment',message.attachments.id,message.id])|raw }}';"></span> <span class="knowledgebaseattachmenticon"></span> <a href="{{ getUrl(controller,action,['view',message.ticket_id,'attachment',message.attachments.id,message.id])|raw }}" target="_blank">{{ message.attachments.name }} ({{ formatBytes(message.attachments.filesize) }})</a></div>

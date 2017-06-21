@@ -3,11 +3,11 @@
 {% if agent|is_array %}
 <input type="hidden" name="staff_id" value="{{ agent.id }}" />
 {% endif %}
-<table class="widget-table-form">
+<table class="widget-table-form"><!--Formulario de edicion de personal-->
 	<tr>
     	<td width="250">{{ LANG.USERNAME }}*</td>
 		<td><input type="text" style="width:100%" name="username" value="{{ agent.username }}" /></td>
-	</tr>
+	</tr>	
 	<tr>
     	<td>{{ LANG.FULL_NAME }}*</td>
 		<td><input type="text" style="width:100%" name="fullname" value="{{ agent.fullname }}" /></td>

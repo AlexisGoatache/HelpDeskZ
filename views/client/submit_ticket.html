@@ -11,6 +11,7 @@
         {% elseif display_error == 2 %}
         {{ error_message(LANG.CSRF_ERROR) }}
         {% endif %}
+        <!--Este es el formulario de enviar un ticket, donde se selecciona el departamento destinatario -->
         <form method="post" action="{{ getUrl('submit_ticket','displayForm') }}">
 
         <div style="padding:5px 0px"><strong>{{ LANG.DEPARTMENTS }}</strong></div>

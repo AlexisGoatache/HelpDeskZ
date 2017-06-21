@@ -27,6 +27,10 @@
             {% if settings.news == 'yes' %}
             <li><a href="{{ getUrl('news') }}" <?php echo {% if controller == 'news' %}class="current"{% endif %}>{{ LANG.NEWS }}</a></li>
             {% endif %}
+		    
+            <!--Aqui se agregan los botones a la barra de navegación del cliente
+			<li><a href="{{ settings.site_url }}" {% if controller == 'prueba' %}class="current"{% endif %}>Prueba2</a></li-->
+
         </ul>
         <div id="language">
         	{% if settings.client_multilanguage %}
@@ -83,7 +87,7 @@
                     {% else %}
                 	<div class="mheader">{{ LANG.ACCOUNT }}</div>
                     <div class="mcontent">
-                    	<ul>
+                    	<ul><!--Aqui se muestran las opciones de la cuenta, luego que el usuario se loguea-->
                         	<li><a href="{{ getUrl('user_account','profile') }}">{{ LANG.MY_PROFILE }}</a></li>
                         	<li><a href="{{ getUrl('user_account','preferences') }}">{{ LANG.PREFERENCES }}</a></li>
                            	<li><a href="{{ getUrl('user_account','password') }}">{{ LANG.CHANGE_PASSWORD }}</a></li>

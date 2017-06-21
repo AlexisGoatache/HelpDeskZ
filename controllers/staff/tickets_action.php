@@ -6,6 +6,8 @@
  * @author Evolution Script S.A.C.
  * @since 1.0.0
  */
+ //10/02/2017 Alexis Goatache - aqui se modifican el status de los requerimientos
+
 //Query String
 $getvar = $_SERVER['QUERY_STRING'];
 //Ticket Status

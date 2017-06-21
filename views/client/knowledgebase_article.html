@@ -2,11 +2,20 @@
 {% block title %}{{ LANG.KNOWLEDGEBASE }} > {{ article.title }}{% endblock %}
 {% block content %}
 {% include 'knowledgebase_searchbox.html' %}
+<!--Pagina que muestra los articulos de la base de conocimientos-->
 <div class="title">
 	{{ LANG.KNOWLEDGEBASE }} {% if cat_id != 0 %}: {{ cat_title|raw }}{% endif %}
 </div>
 <div class="knowledgebasearticletitle">{{ article.title }}</div>
 <div class="knowledgebasearticletitledescr">{{ LANG.POSTED_BY_ON|replace({'%author%':article.author, '%date%':displayDate(article.date)}) }}</div>
+
+<!--25/01/2017 Alexis Goatache - Mostrar imagen adjunta -->
+{% if attachments|is_array %} 
+    {% for attachment in attachments %}
+		{% if attachment.filetype =='image/png' or attachment.filetype =='image/jpeg' or attachment.filetype =='image/jpg' or attachment.filetype =='image/ico' %}<br/><div><img src="{{ attachment_url }}{{ attachment.id }}"></div> {% endif %}
+    {% endfor %}
+{% endif %}
+
 <div>{{ article.content|raw }}</div>
 
 {% if attachments|is_array %}
